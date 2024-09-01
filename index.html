@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Youtube Downloader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script>
+
+		const params = new URLSearchParams(window.location.search);
+		const xRapidAPIKey = params.get("xrapidapikey");
+		if (!xRapidAPIKey) {
+			alert('Add a xrapidapikey= parameter to the URL with the right key');
+			// Finalize execution
+			throw new Error("Stopping execution");  // Finalize execution
+		}
+
+		function testing(){
+			url1 = "https://rr2---sn-4g5edndr.googlevideo.com/videoplayback?expire=1704662359&ei=98CaZaCOKNDSi9oP3KG5mAs&ip=2a01%3A4f8%3Ac17%3A432e%3A5123%3A4ab3%3Ad511%3A828&id=o-AMKN58qabdlbPUBv0lhsFrN6YHp6c7r3ufHGRhm_pm5D&itag=18&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&mh=8u&mm=31%2C29&mn=sn-4g5edndr%2Csn-4g5lzney&ms=au%2Crdu&mv=m&mvi=2&pl=44&initcwndbps=402500&spc=UWF9fwpFDvGpQtejjZU2W1lDjue1FGM&vprv=1&svpuc=1&mime=video%2Fmp4&cnr=14&ratebypass=yes&dur=56.354&lmt=1665621667514557&mt=1704640394&fvip=5&fexp=24007246&c=ANDROID&txp=1438434&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=AJfQdSswRQIgY9fsbyboWK3_vUDwAAKVS7_rpu0Lru8qm5YT_03ow2kCIQDXLIN31nRbY_BrfSmTFAIK1obwwy_AmFmIWh3QqlKBuA%3D%3D&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AAO5W4owRQIhAPLxV1C-vJO3wpTXEE89tSbjs6f3yZF6kg7KJ23NwUXuAiA38-hhA46_wSMFVnAjzDe9t3LTwxaOPaVU-jRaecNgTg%3D%3D&title=Trump%20NAFTA%20is%20the%20worst%20trade%20deal%20made%20by%20any%20country_360p"
+			url2 = "https://rr5---sn-4g5e6nze.googlevideo.com/videoplayback?expire=1704657727&ei=366aZczdDI6Pi9oPiquniAs&ip=2a01%3A4f8%3Ac17%3A432e%3A5123%3A4ab3%3Ad511%3A828&id=o-AEQ7XYoGGE76CBosV_vx5ocLIl9-9L5fDLhJNuCtwMhc&itag=18&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&mh=Wt&mm=31%2C26&mn=sn-4g5e6nze%2Csn-f5f7lnl6&ms=au%2Conr&mv=m&mvi=5&pl=44&initcwndbps=500000&spc=UWF9f0IAT3U71wDhjjgWElV2UrUAeMY&vprv=1&svpuc=1&mime=video%2Fmp4&cnr=14&ratebypass=yes&dur=2.020&lmt=1689714422191856&mt=1704635826&fvip=2&fexp=24007246&beids=24350017&c=ANDROID&txp=1438434&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=AJfQdSswRAIgGwCTy0NC6eHXqdmLsZcIbSMGwASuYpbANlrLaJ3anxACIG1UfFM4qQCwGfArq-BJazC55IZyAgh9hkHhmtpGpLkA&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AAO5W4owRAIgY5taGss7uLiAkLZWCr3jkxSzU5EEP4cI1zurRG-bbm0CIH1vqomdmeHDMRKOxugh6e8jVvjZmDnD09VBPKLUaPq0&title=%C2%BFPero%20que%20me%20estas%20container_360p"
+			var downloadLink = document.createElement('a');
+			downloadLink.style.display = "none";
+	        document.body.appendChild(downloadLink);
+			downloadLink.href = url1;
+			downloadLink.download = '1';
+			var downloadLink2 = document.createElement('a');
+			downloadLink2.style.display = "none";
+	        document.body.appendChild(downloadLink2);
+			downloadLink2.href = url2;
+			downloadLink2.download = '2';
+			
+			downloadLink.click();
+			setTimeout(function(){
+				downloadLink2.click();
+			    console.log("Now just clicked 2");
+			}, 3000);
+			console.log("continue")
+			
+		}
+		
+		function main() {
+			console.log('running');
+			clearLog();
+			var idArray = getVideoIds();
+			if (idArray.length === 0){
+				log("No valid ids");
+				return;
+			} else {
+				log(idArray.length + ' videos found.');
+			}
+			for (i in idArray) {
+				getVideo(idArray[i]);
+			}
+		}
+
+		async function getVideo(videoId){
+			const videoData = await getVideoData(videoId);
+			downloadVideo(videoId, videoData);
+		}
+
+		async function getVideoData(videoId){
+			try {
+				const response = await fetch('https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=' + videoId, {
+					method: "GET",
+					headers: { "X-RapidAPI-Key": xRapidAPIKey,
+							   "X-RapidAPI-Host": "ytstream-download-youtube-videos.p.rapidapi.com" }
+				});
+				if (response.ok) {
+					const responseData = await response.json(); // Parse the response as JSON
+					return responseData;
+				} else {
+					log('Error exchanging code: ' + response.status + " " + response.statusText);
+				}
+
+			} catch (error) {
+				log('Error during the request: ' + error.message);
+			}
+
+		}
+
+		function downloadVideo(id, videoData){
+				if (videoData !== undefined && videoData !== null && videoData.constructor == Array ){
+					log("Couldn't get video data for " + id);
+					return;
+				} else {
+					var media_type  = document.getElementById('media_type').value; 
+					var action  = document.getElementById('action').value;
+					videoURL = getVideoURL(videoData,media_type);
+					videoThumbnail = getVideoThumbNail(videoData);
+					if (videoURL === ""){
+						log("Couldn't get video url for " + id);
+						return;
+					}
+					fileName = getFileName(videoData, media_type);
+					// add &title=download name at the end to choose the desired save filename
+					videoURL = videoURL + '&title=' + encodeURIComponent(fileName);					
+					
+					var divVideoObject = document.createElement("div");
+					divVideoObject.setAttribute('class',"videoObject");
+					divVideoObject.setAttribute('id',id);
+					document.body.appendChild(divVideoObject);
+					
+					switch (action) {
+					  case "iframe":
+							//log("Downloading " + fileName);
+							setIFrame(divVideoObject, videoURL, fileName);
+							break;
+					  case "video":
+						    setVideo(divVideoObject, videoURL, videoThumbnail);
+							break;
+					  case "aref":
+							setARef(divVideoObject, videoURL, fileName)
+							break;
+					}
+				}			
+		}
+		
+		function setIFrame(divVideoObject, videoURL, fileName){
+			/**
+			Function to download the video to disk, ideally with a customized file name
+			
+			From https://stackoverflow.com/questions/1066452/easiest-way-to-open-a-download-window-without-navigating-away-from-the-page
+
+			Don't remember what this does:
+			window.open(url, 'download_window', 'toolbar=0,location=no,directories=0,status=0,scrollbars=0,resizeable=0,width=1,height=1,top=0,left=0');
+			window.focus();
+			
+			*/
+			var downloadFrame = document.createElement("iframe"); 
+			downloadFrame.setAttribute('src',videoURL);
+			downloadFrame.setAttribute('name',fileName);
+			//downloadFrame.setAttribute('id',id);
+			downloadFrame.setAttribute('style',"border:none;");
+			divVideoObject.appendChild(downloadFrame);
+
+		}
+
+		function setVideo(divVideoObject, videoURL, videoThumbnail){
+			/**
+				https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
+				
+			*/
+			var videoObj = document.createElement("video"); 
+			videoObj.setAttribute('controls',"");
+			videoObj.setAttribute('src',videoURL);
+			if (videoThumbnail != ""){
+				videoObj.setAttribute('poster',videoThumbnail);
+			}
+			videoObj.setAttribute('width',"360");
+						
+			var frameLabel = document.createElement("label"); 
+			//frameLabel.setAttribute('for',id);
+			frameLabel.textContent = fileName;
+			
+			divVideoObject.appendChild(frameLabel);
+			divVideoObject.appendChild(document.createElement("br"));
+			divVideoObject.appendChild(videoObj);
+			divVideoObject.appendChild(document.createElement("br"));
+		}
+		
+		function setARef(divVideoObject, videoURL, fileName){
+			/**
+			Function to append a video object to the screen
+
+			// from https://stackoverflow.com/questions/1066452/easiest-way-to-open-a-download-window-without-navigating-away-from-the-page
+			*/
+			// console.log(videoURL);
+			var downloadLink = document.createElement('a');
+			divVideoObject.appendChild(downloadLink);
+			// downloadLink.id = id
+			downloadLink.style.display = "none";
+			downloadLink.href = videoURL;
+			downloadLink.download = fileName;
+  		    downloadLink.click();
+			downloadLink.remove();
+		}
+		
+		function getFileName(videoData, media_type){
+			var fileName = validFileName(videoData["title"]) + "_" + media_type;	
+			return fileName;
+		}
+		
+		function sleep(milliseconds) {
+		  var start = new Date().getTime();
+		  for (var i = 0; i < 1e7; i++) {
+		    if ((new Date().getTime() - start) > milliseconds){
+		      break;
+		    }
+		  }
+		}
+		
+		function validFileName(s){
+			return s.replace(/[<>:"/\\|?*]/g, '')
+		}
+		
+		function getVideoURL(videoData,media_type){
+			// Parses videoData and extracts the right url based on the requested media format
+			if (!(videoData.hasOwnProperty('status'))) {
+				log("Returned video data has no status field");
+				return "";
+			}
+			if (videoData.status != "OK"){
+				log("Returned video status is not OK");
+				return "";
+			}
+			if (!(videoData.hasOwnProperty('title') && videoData.hasOwnProperty('formats') && videoData.hasOwnProperty('adaptiveFormats'))) {
+				log("Returned video data has no fields title, formats and adaptiveFormats");
+				return "";
+			}				
+			let result = [];
+			switch (media_type) {
+			  case "720p":
+					result = videoData.formats.filter(a => a.qualityLabel === media_type && a.mimeType.includes("video/mp4"));
+					if (result.length === 0){
+						result = videoData.formats.filter(a => a.qualityLabel === "360p" && a.mimeType.includes("video/mp4"));
+					}
+					break;
+			  case "360p":
+				    result = videoData.formats.filter(a => a.qualityLabel === media_type && a.mimeType.includes("video/mp4"));
+					break;
+			  case "audio":
+					result = videoData.adaptiveFormats.filter(a => a.mimeType.includes("audio/mp4"));
+					if (result.length != 0){
+						result = [getMax(result, "bitrate")];
+					}
+					break;
+			}
+			if (result.length != 0){
+				return result[0]['url'];
+			} else {
+				return "";
+			}
+			
+		}
+
+		function getVideoThumbNail(videoData){
+			result = videoData.thumbnail;
+			if (result.length != 0){
+				result = [getMax(result, "width")];
+				return result[0]['url'];
+			}
+			return "";
+		}
+		
+		function getMax(array, propName) {
+		    var max = 0;
+		    var maxItem = null;
+		    for(var i=0; i<array.length; i++) {
+		        var item = array[i];
+		        if(item[propName] > max) {
+		            max = item[propName];
+		            maxItem = item;
+		        }
+		    }
+		
+		    return maxItem;
+		}
+
+		function getVideoIds() {
+			// returns an array of the valid youtube video ids from the form
+			var idArray = [];
+			let content = document.getElementById('inputURLs').value;
+			if (content === '') {
+				log('Please enter some URLs');
+				return idArray;
+			}
+			const urlArray = content.split(/[\s\n\r\t]+/)
+			for (i in urlArray) {
+				id = youtube_id_parser(urlArray[i]);
+				if (id != "") {
+					idArray.push(id)
+				}
+			}
+			idArray = idArray.filter((value, index, array) => array.indexOf(value) === index);
+			console.log(idArray);
+			return idArray;
+		}
+
+		function youtube_id_parser_testing() {
+			var urlArray = [
+				        'https://youtube.com/shorts/dQw4w9WgXcQ?feature=share',
+				        '//www.youtube-nocookie.com/embed/up_lNV-yoK4?rel=0',
+				        'http://www.youtube.com/user/Scobleizer#p/u/1/1p3vcRhsYGo',
+				        'http://www.youtube.com/watch?v=cKZDdG9FTKY&feature=channel',
+				        'http://www.youtube.com/watch?v=yZ-K7nCVnBI&playnext_from=TL&videos=osPknwzXEas&feature=sub',
+				        'http://www.youtube.com/ytscreeningroom?v=NRHVzbJVx8I',
+				        'http://www.youtube.com/user/SilkRoadTheatre#p/a/u/2/6dwqZw0j_jY',
+				        'http://youtu.be/6dwqZw0j_jY',
+				        'http://www.youtube.com/watch?v=6dwqZw0j_jY&feature=youtu.be',
+				        'http://youtu.be/afa-5HQHiAs',
+				        'http://www.youtube.com/user/Scobleizer#p/u/1/1p3vcRhsYGo?rel=0',
+				        'http://www.youtube.com/watch?v=cKZDdG9FTKY&feature=channel',
+				        'http://www.youtube.com/watch?v=yZ-K7nCVnBI&playnext_from=TL&videos=osPknwzXEas&feature=sub',
+				        'http://www.youtube.com/ytscreeningroom?v=NRHVzbJVx8I',
+				        'http://www.youtube.com/embed/nas1rJpm7wY?rel=0',
+				        'http://www.youtube.com/watch?v=peFZbP64dsU',
+				        'http://youtube.com/v/dQw4w9WgXcQ?feature=youtube_gdata_player',
+				        'http://youtube.com/vi/dQw4w9WgXcQ?feature=youtube_gdata_player',
+				        'http://youtube.com/?v=dQw4w9WgXcQ&feature=youtube_gdata_player',
+				        'http://www.youtube.com/watch?v=dQw4w9WgXcQ&feature=youtube_gdata_player',
+				        'http://youtube.com/?vi=dQw4w9WgXcQ&feature=youtube_gdata_player',
+				        'http://youtube.com/watch?v=dQw4w9WgXcQ&feature=youtube_gdata_player',
+				        'http://youtube.com/watch?vi=dQw4w9WgXcQ&feature=youtube_gdata_player',
+				        'http://youtu.be/dQw4w9WgXcQ?feature=youtube_gdata_player'
+				    ];
+					for (i in urlArray) {
+					    console.log(youtube_id_parser(urlArray[i]));
+					}
+			
+		}
+		
+		function youtube_id_parser(url){
+			var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+			var match = url.match(regExp);
+			if (match && match[2].length == 11) {
+			  return match[2];
+			} else {
+			  return "";
+			}
+		}
+
+		function clearForm(){
+			document.getElementById('inputURLs').value = '';
+			clearLog();
+		}
+
+		function clearLog(){
+			document.getElementById('userMessages').innerHTML = '';
+			//document.querySelectorAll('iframe')
+			//  .forEach(iframe => iframe.remove());
+			document.querySelectorAll('.videoObject').forEach(e => e.remove());			
+		}
+
+		function log(content){
+			document.getElementById('userMessages').innerHTML += content;
+			document.getElementById('userMessages').innerHTML += '<br>';
+			console.log(content);
+		}
+		
+	</script>
+	<noscript>Sorry, your browser does not support JavaScript!</noscript>
+	<style>
+      body { background-color: black; }
+	  h1 {
+		  color: lightgrey;
+          font-size: 1.5em
+      }
+	  select {background-color: lightgrey;}
+      button {
+        min-width: 72px;
+        min-height: 36px;
+		background-color: lightgrey;
+        border: 1px solid grey;
+      }
+      label {
+		color: lightgrey;
+        display: block;
+      }
+	  textarea {
+		  color: black;
+		  background-color: lightgrey;
+	  }
+	  p {color: lightgrey;}
+	  buttons {
+		width: 200px;
+		margin: 0 auto;
+		display: inline;
+	  }
+	screenReaderText { 
+		  border: 0; 
+		  clip: rect(0 0 0 0); 
+		  height: 1px; 
+		  margin: -1px; 
+		  overflow: hidden; 
+		  padding: 0; 
+		  position: absolute; 
+		  width: 1px; 
+		}
+	videoObject {
+		display: block;
+	}
+    </style>
+  </head>
+  <body>
+    <h1>Youtube Video Downloader v1.1</h1>
+	  <div class="selectors">
+	  <label for="media_type">Choose a media:</label>
+	  <select name="media_type" id="media_type">
+	    <optgroup label="Video">
+		    <option value="720p">720p</option>
+			<option value="360p">360p</option>
+	    </optgroup>
+	    <optgroup label="Audio">
+	      <option value="audio">Audio</option>
+	    </optgroup>
+	  </select>
+	  <label for="action">Action:</label>
+	  <select name="action" id="action">
+		  <option value="video">Open here</option>
+		  <option value="iframe">Download</option>
+	      <option value="aref">Download (2)</option>
+	  </select>		  
+	  </div>	  
+	  <br>
+	<div class="buttons">
+			<button name="download" class="action_btn download" type="submit" value="Download File" onclick="main()">Download Files</button>
+			<button name="clear" class="action_btn clear" type="submit" value="Clear Form" onclick="clearForm()">Clear Form</button>
+	</div>
+	<br>
+	<label for="inputURLs">Paste here your Youtube URLs, separated by spaces:</label>
+	<br>
+	<textarea id="inputURLs" name="Input URLs" rows="10" cols="50" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ https://www.youtube.com/watch?v=gFLF300I0ps	..."></textarea>
+	<br>
+	<p>Not working? Use <a href="https://en3.yt2conv.com/youtube-to-mp4/">Y2CONV</a></p>
+	<br>
+	<p id="userMessages"></p>  
+	<br>
+  
+	<!--<a download href="https://rr5---sn-4g5edndk.googlevideo.com/videoplayback?dl=1&title=test&expire=1704657727&ei=366aZczdDI6Pi9oPiquniAs&ip=2a01%3A4f8%3Ac17%3A432e%3A5123%3A4ab3%3Ad511%3A828&id=o-AEQ7XYoGGE76CBosV_vx5ocLIl9-9L5fDLhJNuCtwMhc&itag=140&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&spc=UWF9f0IAT3U71wDhjjgWElV2UrUAeMY&vprv=1&svpuc=1&mime=audio%2Fmp4&gir=yes&clen=33773&dur=2.020&lmt=1689714091869873&keepalive=yes&fexp=24007246,24350017&beids=24350017&c=ANDROID&txp=1432434&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJfQdSswRgIhALLbsM6gQuk5JgTYxODn-8osGf3oOH5HdpiSVGUKoUpqAiEAyy9Sms5tH7E0YrhRbTDrNE6fxV_7tx_VCsjVQRmlyxc%3D&title=%C2%BFPero%20que%20me%20estas%20container_audio&redirect_counter=1&cm2rm=sn-4g5e6776&req_id=18cbcfcee2cda3ee&cms_redirect=yes&cmsv=e&mh=Wt&mip=81.35.166.228&mm=34&mn=sn-4g5edndk&ms=ltu&mt=1704639884&mv=m&mvi=5&pl=21&lsparams=mh,mip,mm,mn,ms,mv,mvi,pl&lsig=AAO5W4owRAIgGjzYCOO1olUzDM-XFGaArYJIZT95I3x00MLFrMnGoJICIBoTMUfqkn1BRoYThRcVCkJfi5mLCjkZN1l-0H9LZfwc/mytrack.mp3">Download</a>
+	  <br>-->
+</body></html>
