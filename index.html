@@ -60,7 +60,12 @@
 
 		async function getVideoData(videoId){
 			try {
-				const response = await fetch('https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=' + videoId, {
+				let langURLstring = '';
+				const langSelect = document.getElementById('language_select');
+				if (langSelect.value != '') {
+					langURLstring = '&lang=' + langSelect.value;
+				}
+				const response = await fetch('https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=' + videoId + langURLstring, {
 					method: "GET",
 					headers: { "X-RapidAPI-Key": xRapidAPIKey,
 							   "X-RapidAPI-Host": "ytstream-download-youtube-videos.p.rapidapi.com" }
@@ -382,7 +387,7 @@
     </style>
   </head>
   <body>
-    <h1>Youtube Video Downloader v1.1</h1>
+    <h1>Youtube Video Downloader v1.2</h1>
 	  <div class="selectors">
 	  <label for="media_type">Choose a media:</label>
 	  <select name="media_type" id="media_type">
@@ -394,6 +399,14 @@
 	      <option value="audio">Audio</option>
 	    </optgroup>
 	  </select>
+		<span id="language_wrapper" style="display: none; margin-left: 10px;">
+			<label for="language">Language:</label>
+			<select name="language_select" id="language_select">
+				<option value=""></option>
+				<option value="en">en</option>
+				<option value="es">es</option>
+			</select>
+		</span>
 	  <label for="action">Action:</label>
 	  <select name="action" id="action">
 		  <option value="video">Open here</option>
@@ -418,4 +431,18 @@
   
 	<!--<a download href="https://rr5---sn-4g5edndk.googlevideo.com/videoplayback?dl=1&title=test&expire=1704657727&ei=366aZczdDI6Pi9oPiquniAs&ip=2a01%3A4f8%3Ac17%3A432e%3A5123%3A4ab3%3Ad511%3A828&id=o-AEQ7XYoGGE76CBosV_vx5ocLIl9-9L5fDLhJNuCtwMhc&itag=140&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&spc=UWF9f0IAT3U71wDhjjgWElV2UrUAeMY&vprv=1&svpuc=1&mime=audio%2Fmp4&gir=yes&clen=33773&dur=2.020&lmt=1689714091869873&keepalive=yes&fexp=24007246,24350017&beids=24350017&c=ANDROID&txp=1432434&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJfQdSswRgIhALLbsM6gQuk5JgTYxODn-8osGf3oOH5HdpiSVGUKoUpqAiEAyy9Sms5tH7E0YrhRbTDrNE6fxV_7tx_VCsjVQRmlyxc%3D&title=%C2%BFPero%20que%20me%20estas%20container_audio&redirect_counter=1&cm2rm=sn-4g5e6776&req_id=18cbcfcee2cda3ee&cms_redirect=yes&cmsv=e&mh=Wt&mip=81.35.166.228&mm=34&mn=sn-4g5edndk&ms=ltu&mt=1704639884&mv=m&mvi=5&pl=21&lsparams=mh,mip,mm,mn,ms,mv,mvi,pl&lsig=AAO5W4owRAIgGjzYCOO1olUzDM-XFGaArYJIZT95I3x00MLFrMnGoJICIBoTMUfqkn1BRoYThRcVCkJfi5mLCjkZN1l-0H9LZfwc/mytrack.mp3">Download</a>
 	  <br>-->
-</body></html>
+	<script>
+		const mediaSelect = document.getElementById('media_type');
+		const languageWrapper = document.getElementById('language_wrapper');
+
+		mediaSelect.addEventListener('change', function () {
+		if (mediaSelect.value === 'audio') {
+			languageWrapper.style.display = 'inline-block';
+		} else {
+			languageWrapper.style.display = 'none';
+		}
+		});
+	</script>
+
+	</body>
+</html>
